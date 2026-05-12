@@ -16,6 +16,12 @@ func New(database *sql.DB, groqToken string) http.Handler {
 	mux.Handle("/api/maintenance/", handlers.NewMaintenanceHandler(database))
 	mux.Handle("/api/trucks", handlers.NewTrucksHandler(database))
 	mux.Handle("/api/trucks/", handlers.NewTrucksHandler(database))
+	mux.Handle("/api/trailers", handlers.NewTrailersHandler(database))
+	mux.Handle("/api/trailers/", handlers.NewTrailersHandler(database))
+	mux.Handle("/api/transponders", handlers.NewTranspondersHandler(database))
+	mux.Handle("/api/transponders/", handlers.NewTranspondersHandler(database))
+	mux.Handle("/api/tablets", handlers.NewTabletsHandler(database))
+	mux.Handle("/api/tablets/", handlers.NewTabletsHandler(database))
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)

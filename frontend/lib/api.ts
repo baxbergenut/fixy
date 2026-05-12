@@ -2,6 +2,12 @@ import type {
     InvoiceParseResult,
     MaintenanceCreateRequest,
     MaintenanceLog,
+    Tablet,
+    TabletUpsertRequest,
+    Trailer,
+    TrailerUpsertRequest,
+    Transponder,
+    TransponderUpsertRequest,
     Truck,
 } from "./types";
 
@@ -38,6 +44,18 @@ async function readResponseError(response: Response): Promise<string> {
 
 export async function getTrucks(): Promise<Truck[]> {
     return fetchJson<Truck[]>("/api/trucks");
+}
+
+export async function getTrailers(): Promise<Trailer[]> {
+    return fetchJson<Trailer[]>("/api/trailers");
+}
+
+export async function getTransponders(): Promise<Transponder[]> {
+    return fetchJson<Transponder[]>("/api/transponders");
+}
+
+export async function getTablets(): Promise<Tablet[]> {
+    return fetchJson<Tablet[]>("/api/tablets");
 }
 
 export async function getTruck(id: string): Promise<Truck> {
@@ -81,4 +99,55 @@ export async function createMaintenanceLog(
     }
 
     return response.json() as Promise<MaintenanceLog>;
+}
+
+async function writeJson<T>(path: string, method: "POST" | "PATCH", payload: object): Promise<T> {
+    const response = await fetch(`${apiBaseUrl}${path}`, {
+        method,
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        throw new Error(await readResponseError(response));
+    }
+
+    return response.json() as Promise<T>;
+}
+
+export async function createTrailer(payload: TrailerUpsertRequest): Promise<Trailer> {
+    return writeJson<Trailer>("/api/trailers", "POST", payload);
+}
+
+export async function updateTrailer(
+    id: string,
+    payload: TrailerUpsertRequest,
+): Promise<Trailer> {
+    return writeJson<Trailer>(`/api/trailers/${encodeURIComponent(id)}`, "PATCH", payload);
+}
+
+export async function createTransponder(
+    payload: TransponderUpsertRequest,
+): Promise<Transponder> {
+    return writeJson<Transponder>("/api/transponders", "POST", payload);
+}
+
+export async function updateTransponder(
+    id: string,
+    payload: TransponderUpsertRequest,
+): Promise<Transponder> {
+    return writeJson<Transponder>(`/api/transponders/${encodeURIComponent(id)}`, "PATCH", payload);
+}
+
+export async function createTablet(payload: TabletUpsertRequest): Promise<Tablet> {
+    return writeJson<Tablet>("/api/tablets", "POST", payload);
+}
+
+export async function updateTablet(
+    id: string,
+    payload: TabletUpsertRequest,
+): Promise<Tablet> {
+    return writeJson<Tablet>(`/api/tablets/${encodeURIComponent(id)}`, "PATCH", payload);
 }

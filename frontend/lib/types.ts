@@ -47,6 +47,51 @@ export type MaintenanceLog = {
     updated_at: string;
 };
 
+export type Trailer = {
+    id: string;
+    unit_number: string;
+    vin: string | null;
+    plate_number: string | null;
+    year: number | null;
+    make: string | null;
+    usage_type: string | null;
+    location: string | null;
+    availability: string | null;
+    notes: string | null;
+    created_at: string;
+    updated_at: string;
+};
+
+export type Transponder = {
+    id: string;
+    truck_id: string | null;
+    truck_unit_number: string | null;
+    transponder_number: string | null;
+    old_transponder_number: string | null;
+    mc_company: string | null;
+    status: string;
+    notes: string | null;
+    created_at: string;
+    updated_at: string;
+};
+
+export type Tablet = {
+    id: string;
+    truck_id: string | null;
+    truck_unit_number: string | null;
+    imei: string | null;
+    phone_number: string | null;
+    device_make: string | null;
+    device_model: string | null;
+    contract_type: string | null;
+    contract_start: string | null;
+    contract_end: string | null;
+    status: string | null;
+    notes: string | null;
+    created_at: string;
+    updated_at: string;
+};
+
 export type InvoiceParseResult = {
     vendor: string | null;
     expense_date: string | null;
@@ -74,4 +119,38 @@ export type MaintenanceCreateRequest = {
     manager_verified?: boolean;
     accounting_verified?: boolean;
     invoice_file_url?: string | null;
+};
+
+export type TrailerUpsertRequest = {
+    unit_number: string;
+    vin?: string | null;
+    plate_number?: string | null;
+    year?: number | null;
+    make?: string | null;
+    usage_type?: string | null;
+    location?: string | null;
+    availability?: string | null;
+    notes?: string | null;
+};
+
+export type TransponderUpsertRequest = {
+    truck_id?: string | null;
+    transponder_number: string;
+    old_transponder_number?: string | null;
+    mc_company?: string | null;
+    status?: string | null;
+    notes?: string | null;
+};
+
+export type TabletUpsertRequest = {
+    truck_id?: string | null;
+    imei?: string | null;
+    phone_number?: string | null;
+    device_make?: string | null;
+    device_model?: string | null;
+    contract_type?: string | null;
+    contract_start?: string | null;
+    contract_end?: string | null;
+    status?: string | null;
+    notes?: string | null;
 };

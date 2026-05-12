@@ -15,6 +15,21 @@ const navigationItems = [
     description: "Registry and unit details",
   },
   {
+    href: "/trailers",
+    label: "Trailers",
+    description: "Trailer assignments",
+  },
+  {
+    href: "/transponders",
+    label: "Transponders",
+    description: "Toll device assignments",
+  },
+  {
+    href: "/tablets",
+    label: "Tablets",
+    description: "Device assignments",
+  },
+  {
     href: "/maintenance",
     label: "Maintenance logs",
     description: "Operations history",
@@ -54,7 +69,8 @@ export default function SidebarNav() {
       <div className="sidebar-footer">
         <p className="sidebar-footer-label">Live sections</p>
         <p className="sidebar-footer-copy">
-          Dashboard, trucks, and maintenance logs share this shell.
+          Dashboard, trucks, trailers, transponders, tablets, and maintenance
+          logs share this shell.
         </p>
       </div>
     </aside>

@@ -1,8 +1,20 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { getMaintenanceLogs, getTruck, getTrucks } from "../../../lib/api";
-import type { MaintenanceLog, Truck, TruckStatus } from "../../../lib/types";
+import {
+  getMaintenanceLogs,
+  getTablets,
+  getTransponders,
+  getTruck,
+  getTrucks,
+} from "../../../lib/api";
+import type {
+  MaintenanceLog,
+  Tablet,
+  Transponder,
+  Truck,
+  TruckStatus,
+} from "../../../lib/types";
 
 function statusTone(status: TruckStatus) {
   switch (status) {
@@ -104,6 +116,8 @@ export default async function TruckDetailPage({ params }: TruckPageParams) {
 
   let truck: Truck;
   let history: MaintenanceLog[] = [];
+  let transponders: Transponder[] = [];
+  let tablets: Tablet[] = [];
 
   try {
     truck = await getTruck(id);
@@ -116,6 +130,21 @@ export default async function TruckDetailPage({ params }: TruckPageParams) {
   } catch {
     history = [];
   }
+
+  try {
+    [transponders, tablets] = await Promise.all([
+      getTransponders(),
+      getTablets(),
+    ]);
+  } catch {
+    transponders = [];
+    tablets = [];
+  }
+
+  const truckTransponders = transponders.filter(
+    (item) => item.truck_id === truck.id,
+  );
+  const truckTablets = tablets.filter((item) => item.truck_id === truck.id);
 
   return (
     <main className="page-shell">
@@ -196,6 +225,56 @@ export default async function TruckDetailPage({ params }: TruckPageParams) {
             <DetailField label="Notes" value={truck.notes ?? "-"} />
             <DetailField label="Active" value={truck.active ? "Yes" : "No"} />
           </div>
+        </DetailCard>
+      </div>
+
+      <div className="detail-grid">
+        <DetailCard title="Transponders">
+          {truckTransponders.length === 0 ? (
+            <div className="empty-state">
+              <h2>No transponder assigned</h2>
+              <p>This truck does not have a transponder record yet.</p>
+            </div>
+          ) : (
+            <div className="detail-fields-grid">
+              {truckTransponders.map((item) => (
+                <div className="detail-field" key={item.id}>
+                  <span className="detail-label">
+                    {item.transponder_number ?? "Transponder"}
+                  </span>
+                  <strong className="detail-value">
+                    {item.old_transponder_number ??
+                      item.mc_company ??
+                      item.status}
+                  </strong>
+                </div>
+              ))}
+            </div>
+          )}
+        </DetailCard>
+
+        <DetailCard title="Tablets">
+          {truckTablets.length === 0 ? (
+            <div className="empty-state">
+              <h2>No tablet assigned</h2>
+              <p>This truck does not have a tablet record yet.</p>
+            </div>
+          ) : (
+            <div className="detail-fields-grid">
+              {truckTablets.map((item) => (
+                <div className="detail-field" key={item.id}>
+                  <span className="detail-label">{item.imei ?? "Tablet"}</span>
+                  <strong className="detail-value">
+                    {[item.device_make, item.device_model]
+                      .filter(Boolean)
+                      .join(" ") ||
+                      item.status ||
+                      "-"}
+                  </strong>
+                </div>
+              ))}
+            </div>
+          )}
         </DetailCard>
       </div>
 
