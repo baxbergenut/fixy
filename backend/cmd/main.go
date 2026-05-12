@@ -8,11 +8,17 @@ import (
 	"strings"
 	"time"
 
+	"fixy-backend/internal/config"
 	"fixy-backend/internal/db"
+	"fixy-backend/internal/middleware"
 	"fixy-backend/internal/router"
 )
 
 func main() {
+	if err := config.Load(".env", "backend/.env", "../.env"); err != nil {
+		log.Printf("load env: %v", err)
+	}
+
 	ctx := context.Background()
 	database, err := db.Open(ctx, os.Getenv("DATABASE_URL"))
 	if err != nil {
@@ -33,7 +39,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:              ":" + port,
-		Handler:           router.New(database),
+		Handler:           middleware.CORS(middleware.Logger(router.New(database, os.Getenv("GROQ_TOKEN")))),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
