@@ -25,10 +25,6 @@ export default async function TranspondersPage() {
         <div>
           <p className="eyebrow">Toll devices</p>
           <h1 className="hero-title">Transponders</h1>
-          <p className="hero-copy">
-            Assign transponders to trucks and keep the active device list
-            current.
-          </p>
         </div>
         <div className="hero-metrics">
           <div className="hero-metric">

@@ -77,10 +77,6 @@ export default function DashboardPage() {
         <div>
           <p className="eyebrow">Fleet control</p>
           <h1 className="hero-title">Maintenance dashboard</h1>
-          <p className="hero-copy">
-            A dense, at-a-glance view of fleet status, maintenance pressure, and
-            the trucks that need attention now.
-          </p>
         </div>
         <div className="hero-metrics">
           <div className="hero-metric">

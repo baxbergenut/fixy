@@ -22,10 +22,6 @@ export default async function TabletsPage() {
         <div>
           <p className="eyebrow">Device inventory</p>
           <h1 className="hero-title">Tablets</h1>
-          <p className="hero-copy">
-            Track tablet assignments, contract dates, and device details by
-            truck.
-          </p>
         </div>
         <div className="hero-metrics">
           <div className="hero-metric">

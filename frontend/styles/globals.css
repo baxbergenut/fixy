@@ -10,19 +10,25 @@
   --amber: #b08a34;
   --red: #a84a4a;
   --muted-pill: #6f6f6f;
+  --radius: 10px;
 }
 
 * {
   box-sizing: border-box;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 html,
 body {
   margin: 0;
   min-height: 100%;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.04), transparent 34%),
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
 }
 
@@ -34,6 +40,7 @@ body {
 .app-shell {
   display: flex;
   min-height: 100vh;
+  background: var(--bg);
 }
 
 .app-sidebar {
@@ -44,7 +51,7 @@ body {
   min-height: 100vh;
   padding: 24px 18px;
   border-right: 1px solid var(--border);
-  background: rgba(17, 17, 17, 0.96);
+  background: var(--panel);
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -53,6 +60,7 @@ body {
 .app-main {
   flex: 1;
   min-width: 0;
+  background: var(--bg);
 }
 
 .sidebar-brand h1 {
@@ -77,6 +85,7 @@ body {
   padding: 12px 14px;
   border: 1px solid var(--border);
   background: var(--panel);
+  border-radius: var(--radius);
 }
 
 .sidebar-link:hover,
@@ -138,6 +147,7 @@ select {
 .stat-card {
   background: var(--panel);
   border: 1px solid var(--border);
+  border-radius: var(--radius);
 }
 
 .hero-panel {
@@ -172,16 +182,18 @@ select {
 }
 
 .hero-metrics {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
   gap: 12px;
-  align-content: start;
-  min-width: 220px;
 }
 
 .hero-metric {
+  min-width: 180px;
   padding: 14px;
   border: 1px solid var(--border);
   background: var(--panel-alt);
+  border-radius: var(--radius);
 }
 
 .hero-action-card {
@@ -201,6 +213,7 @@ select {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 11px;
+  border-radius: var(--radius);
 }
 
 .hero-action-button:hover {
@@ -243,6 +256,7 @@ select {
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
+  border-radius: 999px;
 }
 
 .status-pill.green {
@@ -351,6 +365,7 @@ select {
   border: 1px solid var(--border);
   background: var(--panel-alt);
   color: var(--text);
+  border-radius: var(--radius);
 }
 
 .telegram-link:hover {
@@ -414,6 +429,7 @@ select {
   padding: 12px;
   border: 1px solid var(--border);
   background: var(--panel-alt);
+  border-radius: var(--radius);
 }
 
 .detail-label {
@@ -483,6 +499,7 @@ select {
   background: var(--bg);
   color: var(--text);
   padding: 10px 12px;
+  border-radius: var(--radius);
 }
 
 .form-field textarea {
@@ -508,6 +525,7 @@ select {
   padding: 12px;
   border: 1px solid var(--border);
   background: var(--panel-alt);
+  border-radius: var(--radius);
 }
 
 .checkbox-field input {
@@ -520,6 +538,7 @@ select {
   padding: 18px;
   border: 1px dashed var(--border);
   background: var(--panel-alt);
+  border-radius: var(--radius);
 }
 
 .file-input {
@@ -535,6 +554,7 @@ select {
   padding: 16px;
   border: 1px solid var(--border);
   background: var(--panel-alt);
+  border-radius: var(--radius);
 }
 
 .preview-grid {
@@ -573,6 +593,7 @@ select {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 11px;
+  border-radius: var(--radius);
 }
 
 .primary-button:disabled {
@@ -602,6 +623,7 @@ select {
   padding: 14px;
   border: 1px solid var(--border);
   background: var(--panel-alt);
+  border-radius: var(--radius);
 }
 
 .alert-title {

@@ -69,10 +69,6 @@ export default async function TrucksPage() {
         <div>
           <p className="eyebrow">Fleet registry</p>
           <h1 className="hero-title">Trucks</h1>
-          <p className="hero-copy">
-            Every truck in the fleet, with live status and maintenance markers.
-            Select any unit to open the full record.
-          </p>
         </div>
         <div className="hero-metrics">
           <div className="hero-metric">

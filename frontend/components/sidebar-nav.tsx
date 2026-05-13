@@ -44,7 +44,6 @@ export default function SidebarNav() {
       <div className="sidebar-brand">
         <p className="eyebrow">Fixy Fleet</p>
         <h1>Fleet board</h1>
-        <p>Static navigation for the core operations views.</p>
       </div>
 
       <nav className="sidebar-nav" aria-label="Primary">
@@ -65,14 +64,6 @@ export default function SidebarNav() {
           );
         })}
       </nav>
-
-      <div className="sidebar-footer">
-        <p className="sidebar-footer-label">Live sections</p>
-        <p className="sidebar-footer-copy">
-          Dashboard, trucks, trailers, transponders, tablets, and maintenance
-          logs share this shell.
-        </p>
-      </div>
     </aside>
   );
 }

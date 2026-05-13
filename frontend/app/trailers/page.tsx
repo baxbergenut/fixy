@@ -21,10 +21,6 @@ export default async function TrailersPage() {
         <div>
           <p className="eyebrow">Trailer registry</p>
           <h1 className="hero-title">Trailers</h1>
-          <p className="hero-copy">
-            Keep trailer records current and edit trailer details from one
-            screen.
-          </p>
         </div>
         <div className="hero-metrics">
           <div className="hero-metric">

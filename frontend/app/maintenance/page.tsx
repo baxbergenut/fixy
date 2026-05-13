@@ -64,9 +64,6 @@ export default async function MaintenanceLogsPage() {
         <div>
           <p className="eyebrow">Operations log</p>
           <h1 className="hero-title">Maintenance logs</h1>
-          <p className="hero-copy">
-            A running history of work performed on trucks and trailers.
-          </p>
         </div>
         <div className="hero-metrics">
           <div className="hero-metric">
