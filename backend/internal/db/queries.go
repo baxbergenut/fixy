@@ -301,6 +301,7 @@ const MaintenanceLogColumns = `
 	ml.reference_number,
 	ml.who_covers,
 	ml.paid_by,
+	ml.telegram_message,
 	ml.manager_verified,
 	ml.accounting_verified,
 	ml.invoice_file_url,
@@ -338,11 +339,12 @@ INSERT INTO maintenance_logs (
 	reference_number,
 	who_covers,
 	paid_by,
+	telegram_message,
 	manager_verified,
 	accounting_verified,
 	invoice_file_url
 )
 VALUES (
-	$1, $2, $3, $4, $5, $6, COALESCE($7::expense_category, 'Other'::expense_category), $8, $9, $10, $11, $12, COALESCE($13, FALSE), COALESCE($14, FALSE), $15
+	$1, $2, $3, $4, $5, $6, COALESCE($7::expense_category, 'Other'::expense_category), $8, $9, $10, $11, $12, $13, COALESCE($14, FALSE), COALESCE($15, FALSE), $16
 )
 RETURNING id`

@@ -182,7 +182,7 @@ func (bot *TelegramEFSBot) handleUpdate(ctx context.Context, update telegramUpda
 	var insertedCount int
 	var blockErrors []error
 	for index, block := range blocks {
-		if err := bot.insertMaintenanceBlock(ctx, update.Message.From, block); err != nil {
+		if err := bot.insertMaintenanceBlock(ctx, update.Message, block); err != nil {
 			blockErrors = append(blockErrors, fmt.Errorf("block %d: %w", index+1, err))
 			continue
 		}
@@ -199,7 +199,7 @@ func (bot *TelegramEFSBot) handleUpdate(ctx context.Context, update telegramUpda
 	return nil
 }
 
-func (bot *TelegramEFSBot) insertMaintenanceBlock(ctx context.Context, sender *telegramUser, block string) error {
+func (bot *TelegramEFSBot) insertMaintenanceBlock(ctx context.Context, message *telegramMessage, block string) error {
 	parsed, err := parseTelegramMaintenance(ctx, bot.groqToken, block)
 	if err != nil {
 		return err
@@ -242,8 +242,13 @@ func (bot *TelegramEFSBot) insertMaintenanceBlock(ctx context.Context, sender *t
 		category = NormalizeMaintenanceCategory(*parsed.Category)
 	}
 
+	var sender *telegramUser
+	if message != nil {
+		sender = message.From
+	}
 	paidBy := telegramSenderName(sender)
 	expenseDate := time.Now().Format("2006-01-02")
+	telegramMessage := strings.TrimSpace(block)
 
 	row := bot.database.QueryRowContext(ctx, db.InsertMaintenanceLogQuery,
 		truckID,
@@ -258,6 +263,7 @@ func (bot *TelegramEFSBot) insertMaintenanceBlock(ctx context.Context, sender *t
 		nullableString(referenceNumber),
 		nullableString(whoCovers),
 		nullableString(paidBy),
+		nullableString(telegramMessage),
 		false,
 		false,
 		nil,

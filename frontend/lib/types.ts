@@ -40,6 +40,7 @@ export type MaintenanceLog = {
     reference_number: string | null;
     who_covers: string | null;
     paid_by: string | null;
+    telegram_message: string | null;
     manager_verified: boolean;
     accounting_verified: boolean;
     invoice_file_url: string | null;

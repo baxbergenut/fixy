@@ -118,6 +118,7 @@ CREATE TABLE maintenance_logs (
   reference_number     VARCHAR(100),
   who_covers           VARCHAR(30),
   paid_by              VARCHAR(30),
+  telegram_message     TEXT,
   manager_verified     BOOLEAN          NOT NULL DEFAULT FALSE,
   accounting_verified  BOOLEAN          NOT NULL DEFAULT FALSE,
   invoice_file_url     TEXT,

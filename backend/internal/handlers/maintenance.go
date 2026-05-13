@@ -37,6 +37,19 @@ func (handler *MaintenanceHandler) ServeHTTP(w http.ResponseWriter, r *http.Requ
 		default:
 			methodNotAllowed(w, http.MethodGet, http.MethodPost)
 		}
+	case strings.HasPrefix(path, "/"):
+		id := strings.TrimPrefix(path, "/")
+		if id == "" || strings.Contains(id, "/") {
+			notFound(w)
+			return
+		}
+
+		switch r.Method {
+		case http.MethodGet:
+			handler.show(w, r, id)
+		default:
+			methodNotAllowed(w, http.MethodGet)
+		}
 	default:
 		notFound(w)
 	}
@@ -131,6 +144,7 @@ func (handler *MaintenanceHandler) create(w http.ResponseWriter, r *http.Request
 		nullString(request.ReferenceNumber),
 		nullString(request.WhoCovers),
 		nullString(request.PaidBy),
+		nil,
 		managerVerified,
 		accountingVerified,
 		nullString(request.InvoiceFileURL),
@@ -152,6 +166,21 @@ func (handler *MaintenanceHandler) create(w http.ResponseWriter, r *http.Request
 	writeJSON(w, http.StatusCreated, createdLog)
 }
 
+func (handler *MaintenanceHandler) show(w http.ResponseWriter, r *http.Request, id string) {
+	row := handler.database.QueryRowContext(r.Context(), db.GetMaintenanceLogQuery, id)
+	logEntry, err := scanMaintenanceLog(row)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			notFound(w)
+			return
+		}
+		serverError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, logEntry)
+}
+
 func stringValue(value *string) string {
 	if value == nil {
 		return ""
@@ -162,7 +191,7 @@ func stringValue(value *string) string {
 
 func scanMaintenanceLog(scanner rowScanner) (models.MaintenanceLog, error) {
 	var logEntry models.MaintenanceLog
-	var truckID, truckUnitNumber, trailerID, trailerUnitNumber, weekLabel, driverName, paymentType, description, referenceNumber, whoCovers, paidBy, invoiceFileURL sql.NullString
+	var truckID, truckUnitNumber, trailerID, trailerUnitNumber, weekLabel, driverName, paymentType, description, referenceNumber, whoCovers, paidBy, telegramMessage, invoiceFileURL sql.NullString
 	var amount sql.NullFloat64
 	var expenseDate sql.NullTime
 	var createdAt, updatedAt time.Time
@@ -183,6 +212,7 @@ func scanMaintenanceLog(scanner rowScanner) (models.MaintenanceLog, error) {
 		&referenceNumber,
 		&whoCovers,
 		&paidBy,
+		&telegramMessage,
 		&logEntry.ManagerVerified,
 		&logEntry.AccountingVerified,
 		&invoiceFileURL,
@@ -238,6 +268,10 @@ func scanMaintenanceLog(scanner rowScanner) (models.MaintenanceLog, error) {
 	if paidBy.Valid {
 		value := paidBy.String
 		logEntry.PaidBy = &value
+	}
+	if telegramMessage.Valid {
+		value := telegramMessage.String
+		logEntry.TelegramMessage = &value
 	}
 	if invoiceFileURL.Valid {
 		value := invoiceFileURL.String

@@ -18,6 +18,7 @@ type MaintenanceLog struct {
 	ReferenceNumber    *string   `json:"reference_number,omitempty"`
 	WhoCovers          *string   `json:"who_covers,omitempty"`
 	PaidBy             *string   `json:"paid_by,omitempty"`
+	TelegramMessage    *string   `json:"telegram_message,omitempty"`
 	ManagerVerified    bool      `json:"manager_verified"`
 	AccountingVerified bool      `json:"accounting_verified"`
 	InvoiceFileURL     *string   `json:"invoice_file_url,omitempty"`

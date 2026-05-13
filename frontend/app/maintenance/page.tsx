@@ -27,6 +27,24 @@ function formatUnit(log: MaintenanceLog) {
   return log.truck_unit_number ?? log.trailer_unit_number ?? "-";
 }
 
+function TelegramLinkAction({ message }: { message: string | null }) {
+  if (!message) {
+    return <span className="maintenance-telegram-placeholder">-</span>;
+  }
+
+  return (
+    <span
+      className="telegram-link"
+      aria-label="Telegram message"
+      title={message}
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M21.8 4.2 18.4 20c-.2 1-.8 1.3-1.7.8l-4.7-3.5-2.3 2.2c-.3.3-.6.5-1 .5l.3-5.1 9.3-8.4c.4-.4-.1-.6-.7-.2L6.2 12.4 1.2 10.8c-1-.3-1-1 .2-1.4L20.5 3c.9-.3 1.7.2 1.3 1.2Z" />
+      </svg>
+    </span>
+  );
+}
+
 export default async function MaintenanceLogsPage() {
   let logs: MaintenanceLog[] = [];
   let errorMessage = "";
@@ -93,22 +111,43 @@ export default async function MaintenanceLogsPage() {
                     <th>Date</th>
                     <th>Unit</th>
                     <th>Category</th>
-                    <th>Description</th>
+                    <th className="maintenance-description-header">
+                      Description
+                    </th>
                     <th>Amount</th>
+                    <th>Payment</th>
+                    <th>Paid by</th>
+                    <th>Reference</th>
                     <th>Verified</th>
+                    <th>tg</th>
                   </tr>
                 </thead>
                 <tbody>
                   {logs.map((log) => (
                     <tr key={log.id}>
-                      <td>{formatDate(log.expense_date)}</td>
+                      <td>
+                        <Link
+                          className="truck-link"
+                          href={`/maintenance/${log.id}`}
+                        >
+                          {formatDate(log.expense_date)}
+                        </Link>
+                      </td>
                       <td className="mono">{formatUnit(log)}</td>
                       <td>{log.category}</td>
-                      <td>{log.description ?? "-"}</td>
+                      <td className="maintenance-description">
+                        {log.description ?? "-"}
+                      </td>
                       <td className="mono">{formatCurrency(log.amount)}</td>
+                      <td>{log.payment_type ?? "-"}</td>
+                      <td>{log.paid_by ?? "-"}</td>
+                      <td>{log.reference_number ?? "-"}</td>
                       <td>
                         {log.manager_verified ? "Manager" : "Pending"}
                         {log.accounting_verified ? " / Accounting" : ""}
+                      </td>
+                      <td className="maintenance-telegram-cell">
+                        <TelegramLinkAction message={log.telegram_message} />
                       </td>
                     </tr>
                   ))}

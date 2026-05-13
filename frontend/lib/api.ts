@@ -81,6 +81,10 @@ export async function getMaintenanceLogs(truckId?: string): Promise<MaintenanceL
     return fetchJson<MaintenanceLog[]>(`/api/maintenance${query}`);
 }
 
+export async function getMaintenanceLog(id: string): Promise<MaintenanceLog> {
+    return fetchJson<MaintenanceLog>(`/api/maintenance/${encodeURIComponent(id)}`);
+}
+
 export async function parseInvoice(file: File): Promise<InvoiceParseResult> {
     const formData = new FormData();
     formData.append("file", file);
