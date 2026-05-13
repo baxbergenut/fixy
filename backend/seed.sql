@@ -151,3 +151,67 @@ ON CONFLICT (unit_number) DO UPDATE SET
   notes = EXCLUDED.notes,
   active = TRUE,
   updated_at = NOW();
+
+-- Tablet assignments mirrored from Fleet board.xlsx for the sample trucks
+INSERT INTO tablets (
+  truck_id,
+  imei,
+  phone_number,
+  device_make,
+  device_model,
+  contract_type,
+  contract_start,
+  contract_end,
+  status,
+  notes
+)
+SELECT
+  t.id,
+  '354154262580035',
+  '904-671-4884',
+  'Samsung',
+  'Galaxy Tab A9+ 5G SM-X218U 64GB Graphite',
+  'Installment',
+  '2025-04-30',
+  '2028-04-30',
+  'Active',
+  NULL
+FROM trucks t
+WHERE t.unit_number = '071'
+  AND NOT EXISTS (
+    SELECT 1
+    FROM tablets existing
+    WHERE existing.imei = '354154262580035'
+  );
+
+INSERT INTO tablets (
+  truck_id,
+  imei,
+  phone_number,
+  device_make,
+  device_model,
+  contract_type,
+  contract_start,
+  contract_end,
+  status,
+  notes
+)
+SELECT
+  t.id,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  'Personal',
+  'Her own tablet'
+FROM trucks t
+WHERE t.unit_number = '088'
+  AND NOT EXISTS (
+    SELECT 1
+    FROM tablets existing
+    WHERE existing.truck_id = t.id
+      AND existing.notes = 'Her own tablet'
+  );

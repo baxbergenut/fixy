@@ -11,7 +11,21 @@ import type {
     Truck,
 } from "./types";
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+function resolveApiBaseUrl(): string {
+    const configuredBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+
+    if (configuredBaseUrl) {
+        return configuredBaseUrl.replace(/\/+$/, "");
+    }
+
+    if (typeof window !== "undefined") {
+        return `${window.location.protocol}//${window.location.hostname}:8080`;
+    }
+
+    return "http://localhost:8080";
+}
+
+const apiBaseUrl = resolveApiBaseUrl();
 
 async function fetchJson<T>(path: string): Promise<T> {
     const response = await fetch(`${apiBaseUrl}${path}`, { cache: "no-store" });

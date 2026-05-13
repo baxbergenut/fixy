@@ -79,6 +79,18 @@ SELECT
 FROM trucks
 WHERE id = $1`
 
+const GetTruckIDByUnitNumberQuery = `
+SELECT id
+FROM trucks
+WHERE unit_number = $1
+	OR (
+		unit_number ~ '^[0-9]+$'
+		AND $1 ~ '^[0-9]+$'
+		AND unit_number::int = $1::int
+	)
+ORDER BY active DESC, unit_number
+LIMIT 1`
+
 const CreateTruckQuery = `
 INSERT INTO trucks (
 	unit_number,

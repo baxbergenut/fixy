@@ -12,6 +12,7 @@ import (
 	"fixy-backend/internal/db"
 	"fixy-backend/internal/middleware"
 	"fixy-backend/internal/router"
+	"fixy-backend/internal/services"
 )
 
 func main() {
@@ -31,6 +32,9 @@ func main() {
 			}
 		}()
 	}
+
+	tgBot := services.NewTelegramEFSBot(database, os.Getenv("GROQ_TOKEN"), os.Getenv("TELEGRAM_BOT_TOKEN"))
+	go tgBot.Run(ctx)
 
 	port := strings.TrimSpace(os.Getenv("PORT"))
 	if port == "" {
