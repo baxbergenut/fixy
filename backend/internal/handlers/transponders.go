@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"fixy-backend/internal/db"
+	"fixy-backend/internal/middleware"
 	"fixy-backend/internal/models"
 )
 
@@ -115,6 +116,10 @@ func (handler *TranspondersHandler) show(w http.ResponseWriter, r *http.Request,
 }
 
 func (handler *TranspondersHandler) create(w http.ResponseWriter, r *http.Request) {
+	if _, ok := requireRole(w, r, middleware.RoleAdmin, middleware.RoleFleetManager); !ok {
+		return
+	}
+
 	defer r.Body.Close()
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
@@ -139,6 +144,10 @@ func (handler *TranspondersHandler) create(w http.ResponseWriter, r *http.Reques
 }
 
 func (handler *TranspondersHandler) update(w http.ResponseWriter, r *http.Request, id string) {
+	if _, ok := requireRole(w, r, middleware.RoleAdmin, middleware.RoleFleetManager); !ok {
+		return
+	}
+
 	defer r.Body.Close()
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 

@@ -42,8 +42,12 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr:              ":" + port,
-		Handler:           middleware.CORS(middleware.Logger(router.New(database, os.Getenv("GROQ_TOKEN")))),
+		Addr: ":" + port,
+		Handler: middleware.CORS(middleware.Logger(middleware.Auth(middleware.AuthTokens{
+			Admin:        os.Getenv("AUTH_ADMIN_TOKEN"),
+			Accountant:   os.Getenv("AUTH_ACCOUNTANT_TOKEN"),
+			FleetManager: os.Getenv("AUTH_FLEET_MANAGER_TOKEN"),
+		})(router.New(database, os.Getenv("GROQ_TOKEN"))))),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 

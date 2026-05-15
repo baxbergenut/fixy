@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"fixy-backend/internal/db"
+	"fixy-backend/internal/middleware"
 	"fixy-backend/internal/models"
 	"fixy-backend/internal/services"
 )
@@ -47,8 +48,10 @@ func (handler *MaintenanceHandler) ServeHTTP(w http.ResponseWriter, r *http.Requ
 		switch r.Method {
 		case http.MethodGet:
 			handler.show(w, r, id)
+		case http.MethodPatch:
+			handler.update(w, r, id)
 		default:
-			methodNotAllowed(w, http.MethodGet)
+			methodNotAllowed(w, http.MethodGet, http.MethodPatch)
 		}
 	default:
 		notFound(w)
@@ -89,6 +92,11 @@ func (handler *MaintenanceHandler) list(w http.ResponseWriter, r *http.Request) 
 }
 
 func (handler *MaintenanceHandler) create(w http.ResponseWriter, r *http.Request) {
+	role, ok := requireRole(w, r, middleware.RoleAdmin, middleware.RoleAccountant, middleware.RoleFleetManager)
+	if !ok {
+		return
+	}
+
 	defer r.Body.Close()
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
@@ -131,6 +139,13 @@ func (handler *MaintenanceHandler) create(w http.ResponseWriter, r *http.Request
 		accountingVerified = *request.AccountingVerified
 	}
 
+	if role == middleware.RoleFleetManager {
+		if managerVerified || accountingVerified {
+			writeJSON(w, http.StatusForbidden, map[string]string{"error": "verification is restricted to accountants"})
+			return
+		}
+	}
+
 	row := handler.database.QueryRowContext(r.Context(), db.InsertMaintenanceLogQuery,
 		nullString(request.TruckID),
 		nullString(request.TrailerID),
@@ -164,6 +179,79 @@ func (handler *MaintenanceHandler) create(w http.ResponseWriter, r *http.Request
 	}
 
 	writeJSON(w, http.StatusCreated, createdLog)
+}
+
+func (handler *MaintenanceHandler) update(w http.ResponseWriter, r *http.Request, id string) {
+	role, ok := requireRole(w, r, middleware.RoleAdmin, middleware.RoleAccountant, middleware.RoleFleetManager)
+	if !ok {
+		return
+	}
+
+	defer r.Body.Close()
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+
+	var request maintenancePatchRequest
+	if err := decodeJSON(r, &request); err != nil {
+		badRequest(w, err)
+		return
+	}
+
+	if role == middleware.RoleFleetManager {
+		if request.ManagerVerified != nil || request.AccountingVerified != nil {
+			writeJSON(w, http.StatusForbidden, map[string]string{"error": "verification is restricted to accountants"})
+			return
+		}
+	}
+
+	expenseDate, err := parseDatePtr(request.ExpenseDate)
+	if err != nil {
+		badRequest(w, err)
+		return
+	}
+
+	var amount any
+	if request.Amount != nil {
+		amount = *request.Amount
+	}
+
+	var category any
+	if request.Category != nil {
+		trimmed := strings.TrimSpace(*request.Category)
+		if trimmed != "" {
+			category = services.NormalizeMaintenanceCategory(trimmed)
+		}
+	}
+
+	row := handler.database.QueryRowContext(r.Context(), db.UpdateMaintenanceLogQuery,
+		nullString(request.TruckID),
+		nullString(request.TrailerID),
+		expenseDate,
+		nullString(request.WeekLabel),
+		nullString(request.DriverName),
+		amount,
+		category,
+		nullString(request.PaymentType),
+		nullString(request.Description),
+		nullString(request.ReferenceNumber),
+		nullString(request.WhoCovers),
+		nullString(request.PaidBy),
+		nullBool(request.ManagerVerified),
+		nullBool(request.AccountingVerified),
+		nullString(request.InvoiceFileURL),
+		id,
+	)
+
+	var updatedID string
+	if err := row.Scan(&updatedID); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			notFound(w)
+			return
+		}
+		serverError(w, err)
+		return
+	}
+
+	handler.show(w, r, updatedID)
 }
 
 func (handler *MaintenanceHandler) show(w http.ResponseWriter, r *http.Request, id string) {
@@ -294,6 +382,24 @@ type maintenanceCreateRequest struct {
 	DriverName         *string  `json:"driver_name"`
 	Amount             *float64 `json:"amount"`
 	Category           string   `json:"category"`
+	PaymentType        *string  `json:"payment_type"`
+	Description        *string  `json:"description"`
+	ReferenceNumber    *string  `json:"reference_number"`
+	WhoCovers          *string  `json:"who_covers"`
+	PaidBy             *string  `json:"paid_by"`
+	ManagerVerified    *bool    `json:"manager_verified"`
+	AccountingVerified *bool    `json:"accounting_verified"`
+	InvoiceFileURL     *string  `json:"invoice_file_url"`
+}
+
+type maintenancePatchRequest struct {
+	TruckID            *string  `json:"truck_id"`
+	TrailerID          *string  `json:"trailer_id"`
+	ExpenseDate        *string  `json:"expense_date"`
+	WeekLabel          *string  `json:"week_label"`
+	DriverName         *string  `json:"driver_name"`
+	Amount             *float64 `json:"amount"`
+	Category           *string  `json:"category"`
 	PaymentType        *string  `json:"payment_type"`
 	Description        *string  `json:"description"`
 	ReferenceNumber    *string  `json:"reference_number"`

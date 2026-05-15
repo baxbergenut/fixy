@@ -348,3 +348,25 @@ VALUES (
 	$1, $2, $3, $4, $5, $6, COALESCE($7::expense_category, 'Other'::expense_category), $8, $9, $10, $11, $12, $13, COALESCE($14, FALSE), COALESCE($15, FALSE), $16
 )
 RETURNING id`
+
+const UpdateMaintenanceLogQuery = `
+UPDATE maintenance_logs
+SET
+	truck_id = COALESCE($1, truck_id),
+	trailer_id = COALESCE($2, trailer_id),
+	expense_date = COALESCE($3, expense_date),
+	week_label = COALESCE($4, week_label),
+	driver_name = COALESCE($5, driver_name),
+	amount = COALESCE($6, amount),
+	category = COALESCE($7::expense_category, category),
+	payment_type = COALESCE($8, payment_type),
+	description = COALESCE($9, description),
+	reference_number = COALESCE($10, reference_number),
+	who_covers = COALESCE($11, who_covers),
+	paid_by = COALESCE($12, paid_by),
+	manager_verified = COALESCE($13, manager_verified),
+	accounting_verified = COALESCE($14, accounting_verified),
+	invoice_file_url = COALESCE($15, invoice_file_url),
+	updated_at = NOW()
+WHERE id = $16
+RETURNING id`

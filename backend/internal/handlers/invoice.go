@@ -9,6 +9,7 @@ import (
 
 	"errors"
 
+	"fixy-backend/internal/middleware"
 	"fixy-backend/internal/services"
 )
 
@@ -28,6 +29,10 @@ func (handler *InvoiceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request)
 
 	if r.Method != http.MethodPost {
 		methodNotAllowed(w, http.MethodPost)
+		return
+	}
+
+	if _, ok := requireRole(w, r, middleware.RoleAdmin, middleware.RoleAccountant, middleware.RoleFleetManager); !ok {
 		return
 	}
 

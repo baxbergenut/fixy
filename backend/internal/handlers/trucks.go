@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"fixy-backend/internal/db"
+	"fixy-backend/internal/middleware"
 	"fixy-backend/internal/models"
 )
 
@@ -145,6 +146,10 @@ func (handler *TrucksHandler) show(w http.ResponseWriter, r *http.Request, id st
 }
 
 func (handler *TrucksHandler) create(w http.ResponseWriter, r *http.Request) {
+	if _, ok := requireRole(w, r, middleware.RoleAdmin, middleware.RoleFleetManager); !ok {
+		return
+	}
+
 	defer r.Body.Close()
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
@@ -169,6 +174,10 @@ func (handler *TrucksHandler) create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (handler *TrucksHandler) update(w http.ResponseWriter, r *http.Request, id string) {
+	if _, ok := requireRole(w, r, middleware.RoleAdmin, middleware.RoleFleetManager); !ok {
+		return
+	}
+
 	defer r.Body.Close()
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
@@ -192,6 +201,10 @@ func (handler *TrucksHandler) update(w http.ResponseWriter, r *http.Request, id 
 }
 
 func (handler *TrucksHandler) softDelete(w http.ResponseWriter, r *http.Request, id string) {
+	if _, ok := requireRole(w, r, middleware.RoleAdmin, middleware.RoleFleetManager); !ok {
+		return
+	}
+
 	row := handler.database.QueryRowContext(r.Context(), db.SoftDeleteTruckQuery, id)
 	truck, err := scanTruck(row)
 	if err != nil {

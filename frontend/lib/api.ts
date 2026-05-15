@@ -27,8 +27,24 @@ function resolveApiBaseUrl(): string {
 
 const apiBaseUrl = resolveApiBaseUrl();
 
+function resolveAuthToken(): string {
+    return process.env.NEXT_PUBLIC_AUTH_TOKEN?.trim() ?? "";
+}
+
+function buildAuthHeaders(): Record<string, string> {
+    const token = resolveAuthToken();
+    if (!token) {
+        return {};
+    }
+
+    return { Authorization: `Bearer ${token}` };
+}
+
 async function fetchJson<T>(path: string): Promise<T> {
-    const response = await fetch(`${apiBaseUrl}${path}`, { cache: "no-store" });
+    const response = await fetch(`${apiBaseUrl}${path}`, {
+        cache: "no-store",
+        headers: buildAuthHeaders(),
+    });
 
     if (!response.ok) {
         throw new Error(await readResponseError(response));
@@ -91,6 +107,7 @@ export async function parseInvoice(file: File): Promise<InvoiceParseResult> {
 
     const response = await fetch(`${apiBaseUrl}/api/invoice/parse`, {
         method: "POST",
+        headers: buildAuthHeaders(),
         body: formData,
     });
 
@@ -108,6 +125,7 @@ export async function createMaintenanceLog(
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            ...buildAuthHeaders(),
         },
         body: JSON.stringify(payload),
     });
@@ -124,6 +142,7 @@ async function writeJson<T>(path: string, method: "POST" | "PATCH", payload: obj
         method,
         headers: {
             "Content-Type": "application/json",
+            ...buildAuthHeaders(),
         },
         body: JSON.stringify(payload),
     });
